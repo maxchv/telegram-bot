@@ -1,2 +1,2 @@
-pyTelegramBotAPI==3.6.5
+pyTelegramBotAPI==3.6.6
 apiai==1.2.3
