@@ -1,11 +1,13 @@
 import requests
 import json
+import tokens
 
 
 class CoinApi:
     url = 'https://rest.coinapi.io/v1/exchangerate/{0}/{1}'
-    api_key = 'E77D7AF4-98F7-4C99-BDE3-48A983C2473D'
-    coins = ('BTC', 'ETH', 'XRP', 'BCH', 'XLM', 'EOS', 'LTC', 'ADA', 'XMR', 'TRX', 'MIOTA', 'DASH', 'ETC')
+
+    coins = ('BTC', 'ETH', 'XRP', 'BCH', 'XLM', 'EOS', 'LTC',
+             'ADA', 'XMR', 'TRX', 'MIOTA', 'DASH', 'ETC')
 
     def __init__(self, crypto='BTC', currency='UAH'):
         self.crypto = crypto
@@ -13,7 +15,7 @@ class CoinApi:
 
     def get(self):
         url = self.url.format(self.crypto, self.currency)
-        response = requests.get(url, headers={'X-CoinAPI-Key': self.api_key})
+        response = requests.get(url, headers={'X-CoinAPI-Key': tokens.coinapi})
         if response.status_code == 200:
             data = json.loads(response.text)
             return data.get('rate')

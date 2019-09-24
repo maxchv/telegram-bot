@@ -54,7 +54,8 @@ def crypto_rates(msg):
 @bot.message_handler(commands=['list', 'coins'])
 @logger
 def list_currencies(msg):
-    text = "Список поддерживаемых криптовалют: {}".format(', '.join(CoinApi.coins))
+    text = "Список поддерживаемых криптовалют: {}".format(
+        ', '.join(CoinApi.coins))
     bot.send_message(msg.chat.id, text)
 
 
