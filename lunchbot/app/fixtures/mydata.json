@@ -1,0 +1,131 @@
+[
+{
+  "model": "app.category",
+  "pk": 1,
+  "fields": {
+    "name": "Первые блюда"
+  }
+},
+{
+  "model": "app.category",
+  "pk": 2,
+  "fields": {
+    "name": "Вторые блюда"
+  }
+},
+{
+  "model": "app.category",
+  "pk": 3,
+  "fields": {
+    "name": "Десерты"
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 1,
+  "fields": {
+    "name": "Суп гороховый на овощном бульоне",
+    "weight": 300,
+    "price": "17.00",
+    "category": 1
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 2,
+  "fields": {
+    "name": "Бульон куриный с фрикадельками",
+    "weight": 300,
+    "price": "20.00",
+    "category": 1
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 3,
+  "fields": {
+    "name": "Каша гречневая со сливочным маслом",
+    "weight": 200,
+    "price": "15.00",
+    "category": 2
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 4,
+  "fields": {
+    "name": "Соте из баклажан",
+    "weight": 200,
+    "price": "16.00",
+    "category": 2
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 5,
+  "fields": {
+    "name": "Макароны со сливочным маслом",
+    "weight": 200,
+    "price": "12.00",
+    "category": 2
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 6,
+  "fields": {
+    "name": "Картофель тушёный с курицей",
+    "weight": 230,
+    "price": "27.00",
+    "category": 2
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 7,
+  "fields": {
+    "name": "Отбивная куриная",
+    "weight": 100,
+    "price": "25.00",
+    "category": 2
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 8,
+  "fields": {
+    "name": "Телятина запечённая кусочками с овощами",
+    "weight": 130,
+    "price": "28.00",
+    "category": 2
+  }
+},
+{
+  "model": "app.dish",
+  "pk": 9,
+  "fields": {
+    "name": "Куриная рубленая котлета",
+    "weight": 75,
+    "price": "23.00",
+    "category": 2
+  }
+},
+{
+  "model": "app.day",
+  "pk": 1,
+  "fields": {
+    "day": "2019-10-21",
+    "dishes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  }
+}
+]

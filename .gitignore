@@ -126,3 +126,5 @@ dmypy.json
 
 # Private tokens
 tokens.py
+
+.vscode
