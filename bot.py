@@ -3,8 +3,6 @@ from datetime import datetime
 from telebot import TeleBot
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 from utils import logger
-from crypto import CoinApi
-import ai
 import tokens
 import requests
 from functools import lru_cache
@@ -22,12 +20,11 @@ orders = {}
 
 
 # 4. Добавляем команды /start
-# usage = """*Простой криптобот.*
-# Получить текущий курс криптовалют:
-#    **/list**, **/coins** - список криптовалют
-#    **/rate**, **/price** - текущий курс биткоина в гривне
-#    **/rate ETH** - текущий курс эфира в гривне
-#    **/rate ETH USD** - текущий курс эфира в долларах США """
+
+# @bot.message_handler(commands=['start'])
+# @logger
+# def start(msg):
+#     bot.send_message(msg.chat.id, usage, parse_mode="Markdown")
 
 base_url = 'http://127.0.0.1:8000/api/'
 test_date = datetime(year=2019, month=10, day=21)
@@ -55,7 +52,6 @@ def download_menu(day=datetime.now()):
             dish = requests.get(dish_url).json()
             dish['category'] = requests.get(dish['category']).json()
             menu.append(dish)
-    # print(menu)
     return menu
 
 
@@ -68,7 +64,6 @@ def make_order(user, order):
         "client_id": user.id,
         "address": "Телевизионная, 4а"
     }
-    print(json)
     response = requests.post(f'{base_url}orders/', json=json)
     return response.json()
 
@@ -96,7 +91,6 @@ def callback_order(call):
     if call.message:
         if user.id in orders:
             order = orders.pop(user.id)
-            print(order)
             text = "*Ваш заказ:*\n" + \
                 "".join(
                     f"- {d['name']} *{d['price']}* грн\n" for d in order)
@@ -159,7 +153,6 @@ def callback_dish(call):
     user = call.from_user
     if call.message:
         id = call.data.replace('dish=', '')
-        print('dish id', id)
         dish = next(d for d in download_menu(test_date) if d['id'] == int(id))
         orders.setdefault(user.id, [])
         orders[user.id].append(dish)
@@ -167,37 +160,11 @@ def callback_dish(call):
         # {dish['name']} добавлено в меню.
         bot.answer_callback_query(call.id, f"Сумма заказа: {price}")
 
-# @bot.message_handler(commands=['start'])
-# @logger
-# def start(msg):
-#     bot.send_message(msg.chat.id, usage, parse_mode="Markdown")
-
 
 # # 5. Команды /rate /price
-# @bot.message_handler(commands=['rate', 'price'])
-# @logger
-# def crypto_rates(msg):
-#     args = msg.text.split()
-#     crypto = 'BTC'
-#     currency = 'UAH'
-#     if len(args) > 2:
-#         crypto = args[1]
-#         currency = args[2]
-#     elif len(args) == 2:
-#         crypto = args[1]
-#     print(crypto, currency)
-#     coin = CoinApi(crypto=crypto.upper(), currency=currency.upper())
-#     text = 'Курс для {}: {} {}'.format(coin.crypto, coin.get(), coin.currency)
-#     bot.send_message(msg.chat.id, text)
 
 
 # # 6. Команды /list /coins
-# @bot.message_handler(commands=['list', 'coins'])
-# @logger
-# def list_currencies(msg):
-#     text = "Список поддерживаемых криптовалют: {}".format(
-#         ', '.join(CoinApi.coins))
-#     bot.send_message(msg.chat.id, text)
 
 
 # # 7. Немного AI
