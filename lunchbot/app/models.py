@@ -46,10 +46,11 @@ class Order(models.Model):
     dishes = models.ManyToManyField(Dish, verbose_name='Заказ')
     client_id = models.CharField(max_length=100, verbose_name='ID клиента')
     address = models.CharField(max_length=100, verbose_name='Адрес доставки')
+    completed = models.BooleanField(default=False, verbose_name='Выполнен')
 
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
 
     def __str__(self):
-        return self.name
+        return f'{self.address} клиент {self.client_id}'

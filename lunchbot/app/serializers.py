@@ -6,25 +6,25 @@ class DaySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Day
-        fields = '__all__'
+        fields = 'id', 'day', 'dishes'
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = 'id', 'name'
 
 
 class DishSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Dish
-        fields = '__all__'
+        fields = 'id', 'name', 'weight', 'price', 'category'
 
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = 'id', 'date', 'dishes',  'client_id', 'address'
