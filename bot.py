@@ -1,7 +1,7 @@
 # 1. Подключение нужных пакетов (батарейки)
 from telebot import TeleBot
 import telebot
-from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery, User, LabeledPrice
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery, User, LabeledPrice, ReplyKeyboardMarkup, KeyboardButton
 import tokens
 import logging
 from utils import logger
@@ -123,8 +123,8 @@ def callback_dish(call: CallbackQuery):
     user = call.from_user
     if call.message:
         id = call.data.replace('dish=', '')
-        dish = next(d for d in rest.menu if d['id'] == int(id))
-        register.add_dish(user, dish)
+        # dish = next(d for d in rest.menu if d['id'] == int(id))
+        register.add_dish(user, rest.dish(int(id)))
         price = register.context(user).price
         # {dish['name']} добавлено в меню.
         bot.answer_callback_query(call.id, f"Сумма заказа: {price}")
@@ -144,20 +144,41 @@ def callback_back_category(call: CallbackQuery):
                               reply_markup=category_list(call.from_user))
 
 
+def payment_list():
+    markup = InlineKeyboardMarkup(row_width=2)
+    markup.add(InlineKeyboardButton(
+        "Кредитной картой", callback_data="payment_card"))
+    markup.add(InlineKeyboardButton("Наличыми", callback_data="payment_cash"))
+    return markup
+
+
 def order_complete_handler(msg: Message):
     if msg:
         user = msg.from_user
-        register.set_address(user, msg.text)
+        if register.exists(user):
+            register.set_address(user, msg.text)
+            ctx = register.context(user)
+            bot.send_message(msg.chat.id, "Укажите способ оплаты:",
+                             reply_markup=payment_list())
+        else:
+            bot.send_message(msg.chat.id,
+                             text="Для нового заказа выполните команду /start")
+
+
+@bot.callback_query_handler(func=lambda call: call.data == 'payment_card')
+@logger
+def payment_card(call: CallbackQuery):
+    if call.message:
+        user = call.from_user
         if register.exists(user):
             ctx = register.context(user)
             text = "Ваш заказ:\n" + \
                 "".join(
                     f"- {d['name']} {d['price']} грн\n" for d in ctx.dishes)
             text += f'Общая сумма заказа: {ctx.price} грн'
-            #bot.send_message(msg.chat.id, text, parse_mode="Markdown")
             prices = [LabeledPrice(label=d['name'], amount=int(
                 float(d['price']) * 100)) for d in ctx.dishes]
-            bot.send_invoice(msg.chat.id,
+            bot.send_invoice(call.message.chat.id,
                              title='Обеды в офис',
                              description=text,
                              provider_token=tokens.liqPay,
@@ -165,6 +186,9 @@ def order_complete_handler(msg: Message):
                              prices=prices,
                              start_parameter='office-lunch',
                              invoice_payload='LUNCH')
+        else:
+            bot.send_message(call.message.chat.id,
+                             text="Для нового заказа выполните команду /start")
 
 
 @bot.pre_checkout_query_handler(func=lambda query: True)
@@ -174,22 +198,47 @@ def checkout(pre_checkout_query):
                                                 " try to pay again in a few minutes, we need a small rest.")
 
 
+@bot.callback_query_handler(func=lambda call: call.data == 'payment_cash')
+@logger
+def payment_cash(call: CallbackQuery):
+    order_complete(call.from_user, call.message.chat.id)
+
+
 @bot.message_handler(content_types=['successful_payment'])
 def got_payment(msg: Message):
-    ctx = register.pop(msg.from_user.id)
-    order_id = rest.make_order(ctx)
-    bot.send_message(msg.chat.id, f"Заказ отрпавлен в обработку. Номер заказа: {order_id['id']}",
-                     parse_mode="Markdown")
-    bot.send_message(msg.chat.id,
+    order_complete(msg.from_user, msg.chat.id)
+
+
+def order_complete(user: User, chat_id: int):
+    if register.exists(user):
+        ctx = register.pop(user.id)
+        order_id = rest.make_order(ctx)
+        bot.send_message(chat_id, f"Заказ отрпавлен в обработку. Номер заказа: {order_id['id']}",
+                         parse_mode="Markdown")
+    bot.send_message(chat_id,
                      text="Для нового заказа выполните команду /start")
 
+
+def address_list():
+    markup = ReplyKeyboardMarkup(one_time_keyboard=True)
+    markup.add(KeyboardButton(
+        "Определить местоположение", request_location=True))
+    markup.add(KeyboardButton("Отправить номер телефона", request_contact=True))
+    #markup.add(KeyboardButton("Ввести адрес вручную", callback_data="manual_address"))
+    return markup
 
 @bot.callback_query_handler(func=lambda call: call.data == 'set_address')
 @logger
 def callback_order(call: CallbackQuery):
+    # bot.send_message(call.message.chat.id, "Укажите адрес доставки:",
+    #                          reply_markup=address_list())
     bot.register_next_step_handler(call.message, order_complete_handler)
     bot.send_message(call.message.chat.id, "Введите адрес доставки")
 
+
+@bot.message_handler(content_types=['contact'])
+def contact_handler(message):
+    print(message.contact.phone_number)
 
 if __name__ == '__main__':
     print('Started')

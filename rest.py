@@ -53,7 +53,7 @@ class Service(object):
         '''
         Return dish by id
         '''
-        return next(d for d in self.__menu if d['id'] == id)
+        return next(d for d in self.menu if d['id'] == id)
 
     @logger
     def make_order(self, ctx: Context):
