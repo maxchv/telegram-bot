@@ -1,16 +1,83 @@
 # 1. Подключение нужных пакетов (батарейки)
 from datetime import datetime
 from telebot import TeleBot
-from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery, User
 from utils import logger
 import tokens
 import requests
 from functools import lru_cache
+from enum import Enum
 
 # 2. Создаем бота
 bot = TeleBot(token=tokens.telegram)
 
+
+class Status(Enum):
+    UNKNOWN = 'unknown'
+    START = 'start'
+    CHOOSE_DISH = 'choose dish'
+
+
+class Event(Enum):
+    CREATED = 'created'
+    BACK = 'back'
+    CHOOSE_CATEGORY = 'choose category'
+    COOSE_DISH = 'choose dish'
+    SET_STATUS = 'set status'
+
+class Context:
+
+    def __init__(self):
+        self.__status = Status.UNKNOWN
+        self.__dishes = []
+        self.__category = None
+        self.__history = [{'timestamp': datetime.now(), 'event': Event.CREATED}]
+
+    def __save(self, status: Status, args: any = None):
+        self.__history.append({'timestamp': datetime.now(), 'event': Status, 'args': args})
+
+    def add_dish(self, dish):
+        self.__save(Event.COOSE_DISH, dish)
+        self.dishes.append(dish)
+
+    @property
+    def dishes(self):
+        return self.__dishes
+
+    @property
+    def category(self) -> int:
+        return self.__category
+
+    @category.setter
+    def category(self, value: int):
+        self.__save(Event.CHOOSE_CATEGORY, value)
+        self.__category = value
+
+    @properyt
+    def status(self) -> Status:
+        return self.__status
+
+    @status.setter
+    def status(self, value: Status):
+        self.__save(status)
+        self.__status = value
+
 orders = {}
+statuses = {}
+
+
+class Order:
+
+    def set_status(self, user: User, status: Status):
+        statuses.setdefault(user.id, {})
+        statuses[user.id]['status'] = status
+        pass
+
+    def get_status(self, user: User):
+        return statuses[user.id]['status'] if user.id in statuses else Status.UNKNOWN
+
+
+order = Order()
 
 # 3. Простой эхо чат
 # @bot.message_handler(content_types=['text'])
@@ -69,9 +136,8 @@ def make_order(user, order):
 
 
 usage = """* Добро пожаловать *
-Это бот для заказа обедов в оффис.
+Это бот для заказа обедов в офис.
 """
-
 
 def category_list(user_id=None):
     markup = InlineKeyboardMarkup(row_width=1)
@@ -86,7 +152,7 @@ def category_list(user_id=None):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('order_complete'))
 @logger
-def callback_order(call):
+def callback_order(call: CallbackQuery):
     user = call.from_user
     if call.message:
         if user.id in orders:
@@ -106,7 +172,10 @@ def callback_order(call):
 
 @bot.message_handler(commands=['start'])
 @logger
-def start(msg):
+def start(msg: Message):
+    user = msg.from_user
+    order.set_status(user, Status.START)
+    print(user)
     bot.send_message(msg.chat.id, usage, parse_mode="Markdown")
     bot.send_message(msg.chat.id, "Укажите категорию:",
                      reply_markup=category_list())
@@ -122,14 +191,16 @@ def dishes_by_category(category_id):
         for dish in download_menu(test_date) if dish['category']['id'] == id)
     keyboard = InlineKeyboardMarkup(row_width=1)
     keyboard.add(*dishes, InlineKeyboardButton(
-        text='Вернутся назад ↩', callback_data=f'back'))
+        text='« Вернутся назад', callback_data=f'back'))
     return keyboard, category
 
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith('category='))
+# @bot.callback_query_handler(func=lambda call: call.data.startswith('category='))
+@bot.callback_query_handler(func=lambda call: order.get_status(call.from_user) == Status.START and call.data.startswith('category='))
 @logger
-def callback_category(call):
+def callback_category(call: CallbackQuery):
     if call.message:
+        order.set_status(call.from_user, Status.CHOOSE_DISH)
         id = call.data.replace('category=', '')
         keyboard, category = dishes_by_category(id)
         bot.edit_message_text(chat_id=call.message.chat.id,
@@ -139,7 +210,7 @@ def callback_category(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('back'))
 @logger
-def callback_back_category(call):
+def callback_back_category(call: CallbackQuery):
     if call.message:
         bot.edit_message_text(chat_id=call.message.chat.id,
                               message_id=call.message.message_id,
@@ -149,7 +220,7 @@ def callback_back_category(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('dish='))
 @logger
-def callback_dish(call):
+def callback_dish(call: CallbackQuery):
     user = call.from_user
     if call.message:
         id = call.data.replace('dish=', '')
