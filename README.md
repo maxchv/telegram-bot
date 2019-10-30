@@ -28,5 +28,10 @@ To start:
 
 ## Usefull links
 
+* [14 сервисов для создания чат-бота без навыков программирования](https://vc.ru/services/57488-14-servisov-dlya-sozdaniya-chat-bota-bez-navykov-programmirovaniya)
 * [Пишем ботов для Telegram на языке Python](https://mastergroosha.github.io/telegram-tutorial/)
-* [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI)
+* [Telegram Bot API](https://github.com/eternnoir/pyTelegramBotAPI)
+* [Asynchronous framework for Telegram Bot API](https://github.com/aiogram/aiogram)
+* [python-telegram-bot](https://python-telegram-bot.org/)
+* [ChatterBot](https://github.com/gunthercox/ChatterBot)
+* [DialogFlow](https://github.com/gunthercox/ChatterBot)
