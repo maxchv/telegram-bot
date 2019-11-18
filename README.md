@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# Simple telegram bot demo
-=======
 # Simple telegram bot demo
 
 To start:
@@ -38,4 +35,3 @@ To start:
 * [python-telegram-bot](https://python-telegram-bot.org/)
 * [ChatterBot](https://github.com/gunthercox/ChatterBot)
 * [DialogFlow](https://github.com/gunthercox/ChatterBot)
->>>>>>> a32af5f... added usefull links to README.md
