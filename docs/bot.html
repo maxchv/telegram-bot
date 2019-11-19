@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Создание бота</title>
+</head>
+
+<body>
+    <header>
+        <h1>Основы создания бота</h1>
+    </header>
+    <nav>
+        <select>
+            <option>--</option>
+            <option data-name="EchoBot">Эхо бот</option>
+            <option data-name="ReplyBot">Бот с ответом</option>
+            <option data-name="CommandBot">Бот с командами</option>
+            <option data-name="ReplyMarkup">Бот с клавиатурой</option>
+            <option data-name="InlineMarkup">Бот со встроенной клавиатурой</option>
+        </select>
+    </nav>
+    <p>Файл <strong>requirements.txt</strong> должен включать зависимость от <a
+            href="https://github.com/eternnoir/pyTelegramBotAPI" target="_blank">pyTelegramBotAPI</a>:</p>
+    <pre><code>
+        pyTelegramBotAPI==3.6.6
+    </code></pre>
+
+    <iframe name="replit" height="600px" width="100%" scrolling="no" frameborder="true" allowtransparency="true"
+        allowfullscreen="true"
+        sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+
+    <script>
+        let menu = document.querySelector("nav>select");
+        let frame = document.querySelector("iframe");
+        const url = 'https://repl.it/@MaximShaptala/{data-name}?lite=true';
+        menu.addEventListener('change', function (evnt) {
+            let dataName = evnt.target.options[evnt.target.selectedIndex].getAttribute('data-name');
+            if (dataName) {
+                frame.src = url.replace("{data-name}", dataName);
+            }
+        });
+    </script>
+</body>
+
+</html>
