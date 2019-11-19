@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Введение в программирование на Python</title>
+</head>
+
+<body>
+    <header>
+        <h1>Основы программирования на Python</h1>
+    </header>
+    <nav>
+
+        <select>
+            <option>--</option>
+            <option data-name="Types">Типы данных</option>
+            <option data-name="Condition">Условия</option>
+            <option data-name="Loop">Циклы</option>
+            <option data-name="Function">Функции</option>
+            <option data-name="Decorator">Декораторы</option>
+        </select>
+    </nav>
+
+    <iframe name="replit" height="600px" width="100%" scrolling="no" frameborder="true" allowtransparency="true"
+        allowfullscreen="true"
+        sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+
+    <script>
+        let menu = document.querySelector("nav>select");
+        let frame = document.querySelector("iframe");
+        const url = 'https://repl.it/@MaximShaptala/{data-name}?lite=true';
+        menu.addEventListener('change', function (evnt) {
+            let dataName = evnt.target.options[evnt.target.selectedIndex].getAttribute('data-name');
+            if (dataName) {
+                frame.src = url.replace("{data-name}", dataName);
+            }
+        });
+    </script>
+</body>
+
+</html>
